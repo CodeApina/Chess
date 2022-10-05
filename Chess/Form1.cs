@@ -20,10 +20,16 @@ namespace Chess
         public string Type;
         public bool is_player;
         
-        // Sets the arrays for legal moves
-        public void move()
+        public void Player()
         {
-            if (b.Text != "")
+            is_player = true;
+        }
+
+
+        // Sets the arrays for legal moves
+        public void Move_set()
+        {
+            if (b.Text != string.Empty)
             {
                 Type = b.Text;
             }
@@ -54,15 +60,17 @@ namespace Chess
             }
             if (Type == "K")
             {
-                bool[,] king_moves = new bool[3, 3];
-                king_moves[0, 0] = true;
+                bool[,] king_moves = new bool[5, 3];
                 king_moves[1, 0] = true;
                 king_moves[2, 0] = true;
-                king_moves[0, 1] = true;
-                king_moves[2, 1] = true;
-                king_moves[0, 2] = true;
+                king_moves[3, 0] = true;
+                king_moves[1, 1] = true;
+                king_moves[3, 1] = true;
                 king_moves[1, 2] = true;
                 king_moves[2, 2] = true;
+                king_moves[3, 2] = true;
+                king_moves[4, 1] = true;
+                king_moves[0, 1] = true;
             }
             if (Type == "B")
             {
@@ -123,7 +131,7 @@ namespace Chess
         }
 
         // Sets the color and texts of the buttons
-        public void color_text()
+        public void Color_text()
         {
             if (is_player == true)
             {
@@ -158,28 +166,29 @@ namespace Chess
                 b.Text = "B";
             }
         }
+        public void Move()
+        {
+            
+        }
+    }
 
-    }       
- 
     public partial class Form1 : Form
     {
-        bool player_turn = true;
-        int turn_num = 0;
         string[,] board = new string[8, 8];
-        Piece[,] b_board = new Piece[8, 8];
-        string[,] b_clicked = new string[8, 8];
-        
+        public Button[,] b_board = new Button[8, 8];
+
         public Form1()
         {
             InitializeComponent();
-            button_create();
+            Button_create();
         }
-        private void button_create()
+
+    
+        public void Button_create()
         {
             for (int j = 0; j < 8; j++)
                 for (int i = 0; i < 8; i++)
                 {
-                    b_board[i, j] = new Piece();
 
                     Button b = new Button();
                     b.Size = new Size(50, 50);
@@ -218,19 +227,34 @@ namespace Chess
                         b.BackColor = Color.White;
                     else b.BackColor = Color.SandyBrown;
 
-                    if (b.Text == "")
+                    if (b.Text == string.Empty)
                         b.Enabled = false;
                     this.Controls.Add(b);
-
-                    b.Click += new EventHandler(newButton_CLick);
-                    b_board[i, j].b = b;
+                    b.Click += new EventHandler(NewButton_CLick);
+                    b_board[i, j] = b;
                 }
         }
+         
 
-        private void newButton_CLick(object sender, EventArgs e)
+        private void NewButton_CLick(object sender, EventArgs e)
         {
             Button b = (Button)sender;
 
+            var p = new Piece();
+            // Set's is_player as true
+            p.Player();
+            // Sets Piece.b as sender button
+            p.b = b;
+            // Runs Move_set
+            p.Move_set();
+            // Set's button forecolor
+            p.Color_text();
+            // Get's buttons x and y co-ordinates
+            string[] buttonName = b.Name.Split('_');
+            int x = Convert.ToInt32(buttonName[0]);
+            int y = Convert.ToInt32(buttonName[1]);
+            p.x = x;
+            p.y = y;
             
         }
     }
