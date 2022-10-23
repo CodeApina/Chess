@@ -137,7 +137,6 @@ namespace Chess
             Initialize_Pieces();
             Button_create();
             Board_fill();
-            Check_Mate(check);
 
 
         }
@@ -324,7 +323,6 @@ namespace Chess
             }
 
         }
-        //TODO: FIX
         public void Bishop_Moves(Piece selected_piece)
         {
             bool positive_x_axis_blocked = false;
@@ -383,7 +381,6 @@ namespace Chess
                 }
             }
         }
-        //TODO: FIX
         public void Queen_Moves(Piece selected_piece)
         {
             bool right_down_diagonal_blocked = false;
@@ -515,7 +512,6 @@ namespace Chess
             if (selected_piece.x - 1 >= 0 && selected_piece.y + 1 <= 7)
                 b_board[selected_piece.x - 1, selected_piece.y + 1].Enabled = true;
         }
-        //TODO: Add Knight moves 
         public void Knight_Moves(Piece selected_piece)
         {
             if (selected_piece.y - 2 >= 0)
@@ -563,6 +559,7 @@ namespace Chess
                 }
             }
         }
+        //TODO: Implement Check mate
         public bool Check_Mate(bool check)
         {
             for (int i = 0; i > player_pieces.Length; i++)
@@ -604,7 +601,6 @@ namespace Chess
             if (selected_piece is Knight)
                 Knight_Moves(selected_piece);
         }
-        //TODO: Add check mates
         public void Process_Move(Piece selected_piece, int x, int y)
         {
             selected_piece.x = x;
@@ -657,7 +653,6 @@ namespace Chess
             }
 
         }
-        bool check = false;
         private void Button_CLick(object sender, EventArgs e)
         {
             Button button = (Button)sender;
@@ -686,7 +681,8 @@ namespace Chess
             {
                 Process_Move(m_selected_piece, x, y);
             }
-            check = false;
+            bool check = false;
+            //TODO: Change the timing of the notification
             if (Check_Mate(check))
             {
                 MessageBox.Show("Check");
