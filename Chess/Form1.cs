@@ -471,6 +471,25 @@ namespace Chess
                 }
             }
         }
+        public void King_Moves(Piece selected_piece)
+        {
+            if (selected_piece.x + 1 <= 7)
+                b_board[selected_piece.x + 1, selected_piece.y].Enabled = true;
+            if (selected_piece.x - 1 >= 0)
+                b_board[selected_piece.x - 1, selected_piece.y].Enabled = true;
+            if (selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x, selected_piece.y + 1].Enabled = true;
+            if (selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x, selected_piece.y - 1].Enabled = true;
+            if (selected_piece.x + 1 <= 7 && selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x + 1, selected_piece.y + 1].Enabled = true;
+            if (selected_piece.x - 1 >= 0 && selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x - 1, selected_piece.y - 1].Enabled = true;
+            if (selected_piece.x + 1 <= 7 && selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x + 1, selected_piece.y - 1].Enabled = true;
+            if (selected_piece.x - 1 >= 0 && selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x - 1, selected_piece.y + 1].Enabled = true;
+        }
         public void Set_Tiles_For_Move(Piece selected_piece)
         {
             if (selected_piece is Pawn)
@@ -481,6 +500,8 @@ namespace Chess
                 Bishop_Moves(selected_piece);
             if (selected_piece is Queen)
                 Queen_Moves(selected_piece);
+            if (selected_piece is King)
+                King_Moves(selected_piece);
         }
 
         public void Process_Move(Piece selected_piece, int x, int y)
