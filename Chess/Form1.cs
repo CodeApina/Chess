@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -18,79 +19,114 @@ namespace Chess
         public int y;
         public string piece_text;
         public bool is_on_board = true;
+        public bool has_moved = false;
 
     }
     public sealed class Pawn : Piece
     {
-        public Pawn(int x, int y, string piece_text)
+        public Pawn(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "P";
+            x = x1;
+            y = y1;
         }
 
     }
     public sealed class Rook : Piece
     {
-        public Rook(int x, int y, string piece_text)
+        public Rook(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "R";
+            x = x1;
+            y = y1;
         }
     }
     public sealed class Knight : Piece
     {
-        public Knight(int x, int y, string piece_text)
+        public Knight(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "Kn";
+            x = x1;
+            y = y1;
         }
     }
     public sealed class Bishop : Piece
     {
-        public Bishop(int x, int y, string piece_text)
+        public Bishop(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "B";
+            x = x1;
+            y = y1;
         }
     }
     public sealed class Queen : Piece
     {
-        public Queen(int x, int y, string piece_text)
+        public Queen(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "Q";
+            x = x1;
+            y = y1;
         }
     }
     public sealed class King : Piece 
     {
-        public King(int x, int y, string piece_text)
+        public King(int x1, int y1)
         {
-            piece_text = piece_text;
-            x = x;
-            y = y;
+            piece_text = "K";
+            x = x1;
+            y = y1;
+        }
+    }
+    public static class Prompt
+    {
+        public static int ShowDialog(string text, string caption)
+        {
+            Form prompt = new Form();
+            prompt.Width = 500;
+            prompt.Height = 200;
+            prompt.Text = caption;
+            Label textLabel = new Label() { Left = 50, Top = 20, Text = text, AutoSize = true };
+            NumericUpDown inputBox = new NumericUpDown() { Left = 50, Top = 50, Width = 400, Maximum = 4, Minimum = 1 };
+            Button confirmation = new Button() { Text = "Ok", Left = 350, Width = 100, Top = 70 };
+            confirmation.Click += (sender, e) => { prompt.Close(); };
+            prompt.Controls.Add(confirmation);
+            prompt.Controls.Add(textLabel);
+            prompt.Controls.Add(inputBox);
+            prompt.ShowDialog();
+            return (int)inputBox.Value;
         }
     }
 
     public partial class Form1 : Form
     {
-        string[,] board = new string[8, 8];
         public Button[,] b_board = new Button[8, 8];
         public Piece m_selected_piece = null;
-        public Piece[] player_pieces = new Piece[8];
-        public Piece[] ai_pieces = new Piece[8];
-        
+        public Piece[] player_pieces = new Piece[16];
+        public Piece[] ai_pieces = new Piece[16];
+
         public void Initialize_Pieces()
         {
             for (int i = 0; i < 8; i++)
             {
-                player_pieces[i] = new Pawn(i, 6, "P");
-                ai_pieces[i] = new Pawn(i,1,"P");
+                player_pieces[i] = new Pawn( i, 6);
+                ai_pieces[i] = new Pawn(i,1);
             }
+            player_pieces[8] = new Rook(0, 7);
+            player_pieces[9] = new Rook(7, 7);
+            player_pieces[10] = new Knight(1, 7);
+            player_pieces[11] = new Knight(6, 7);
+            player_pieces[12] = new Bishop(2, 7);
+            player_pieces[13] = new Bishop(5, 7);
+            player_pieces[14] = new Queen(3, 7);
+            player_pieces[15] = new King(4, 7);
+            ai_pieces[8] = new Rook(0, 0);
+            ai_pieces[9] = new Rook(7, 0);
+            ai_pieces[10] = new Knight(1, 0);
+            ai_pieces[11] = new Knight(6, 0);
+            ai_pieces[12] = new Bishop(2, 0);
+            ai_pieces[13] = new Bishop(5, 0);
+            ai_pieces[14] = new Queen(3, 0);
+            ai_pieces[15] = new King(4, 0);
 
 
         }
@@ -99,31 +135,15 @@ namespace Chess
         {
             InitializeComponent();
             Initialize_Pieces();
-            Button_create(m_selected_piece);
+            Button_create();
+            Board_fill();
+            Board_fill();
             
-        }
 
-        public void Place_Pieces(int x, int y, Piece piece)
-        {;
-            //for (int i = 0; i < 16; i++)
-            //{
-            //    x = player_pieces[i].x;
-            //    y = player_pieces[i].y;
-            //    if (b.Name == $"{x}_{y}")
-            //    {
-            //        b.Text = player_pieces[i].piece_text;
-            //    }
-            //    ai_pieces[(int)i].x = x;
-            //    ai_pieces[(int)i].y = y;
-            //    if(b.Name == $"{x}_{y}")
-            //    {
-            //        b.Text = ai_pieces[i].piece_text;
-            //    }
-            //}
         }
 
     
-        public void Button_create(Piece piece)
+        public void Button_create()
         {
             for (int y = 0; y < 8; y++)
                 for (int x = 0; x < 8; x++)
@@ -186,19 +206,346 @@ namespace Chess
                     b_board[x, y] = b;
                 }
         }
-        
+        public void Board_fill()
+        {
+            foreach (Button b in b_board)
+            {
+                b.Text = "";
+                b.Enabled = false;
+            }
+            foreach (Piece piece in player_pieces)
+            {
+                if (piece != null && piece.is_on_board == true)
+                {
+                    Button button = b_board[piece.x, piece.y];
+                    button.Enabled = true;
+                    button.Text = piece.piece_text;
+                    button.ForeColor = Color.Gray;
+                }
+            }
+            foreach (Piece piece in ai_pieces)
+            {
+                if (piece.is_on_board == true)
+                {
+                    Button button = b_board[piece.x, piece.y];
+                    button.Text = piece.piece_text;
+                }
+            }
+        }
+        public void Pawn_Moves(Piece selected_piece)
+        {
+            if (selected_piece.has_moved == false)
+            {
+                b_board[m_selected_piece.x, m_selected_piece.y - 1].Enabled = true;
+                b_board[m_selected_piece.x, m_selected_piece.y - 2].Enabled = true;
+                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                {
+                    b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Enabled = true;
+                }
+                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                {
+                    b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Enabled = true;
+                }
+            }
+            if (selected_piece.has_moved == true && m_selected_piece.y - 1 >= 0)
+            {
+                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                {
+                    b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Enabled = true;
+                }
+                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                {
+                    b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Enabled = true;
+                }
+                if (b_board[m_selected_piece.x, m_selected_piece.y - 1].Text == "")
+                    b_board[m_selected_piece.x, m_selected_piece.y - 1].Enabled = true;
+            }
+        }
+        public void Rook_Moves(Piece selected_piece)
+        {
+            bool positive_x_axis_blocked = false;
+            bool negative_x_axis_blocked = false;
+            bool positive_y_axis_blocked = false;
+            bool negative_y_axis_blocked = false;
+            for (int i = 1; i < 8; i++)
+            {
+                if (m_selected_piece.x + 1 * i <= 7 && !positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text == "")
+                    b_board[selected_piece.x + 1 * i, selected_piece.y].Enabled = true;
+                else if (m_selected_piece.x + 1 * i <= 7 && !positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text != "" && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].ForeColor != Color.Gray)
+                {
+                    b_board[selected_piece.x + 1 * i, selected_piece.y].Enabled = true;
+                    positive_x_axis_blocked = true;
+                }
+                else if (m_selected_piece.x + 1 * i <= 7 && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text != "")
+                    positive_x_axis_blocked = true;
+
+                if (m_selected_piece.x - 1 * i >= 0 && !negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text == "")
+                    b_board[selected_piece.x - 1 * i, selected_piece.y].Enabled = true;
+                else if (m_selected_piece.x - 1 * i >= 0 && !negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y].ForeColor != Color.Gray)
+                {
+                    b_board[selected_piece.x - 1 * i, selected_piece.y].Enabled = true;
+                    negative_x_axis_blocked = true;
+                }
+                else if (m_selected_piece.x - 1 * i >= 0 && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text != "")
+                    negative_x_axis_blocked = true;
+
+                if (m_selected_piece.y + 1 * i <= 7 && !positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text == "")
+                    b_board[selected_piece.x, selected_piece.y + 1 * i].Enabled = true;
+                else if (m_selected_piece.y + 1 * i <= 7 && !positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text != "" && b_board[selected_piece.x, selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                {
+                    b_board[selected_piece.x, selected_piece.y + 1 * i].Enabled = true;
+                    positive_y_axis_blocked = true;
+                }
+                else if (m_selected_piece.y + 1 * i <= 7 && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text != "")
+                    positive_y_axis_blocked = true;
+
+                if (m_selected_piece.y - 1 * i >= 0 && !negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text == "")
+                    b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
+                else if (m_selected_piece.y - 1 * i >= 0 && !negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                {
+                    b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
+                    negative_y_axis_blocked = true;
+                }
+                else if (m_selected_piece.y - 1 * i >= 0 && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text != "")
+                    negative_y_axis_blocked = true;
+            }
+
+        }
+        public void Bishop_Moves(Piece selected_piece)
+        {
+            bool positive_x_axis_blocked = false;
+            bool negative_x_axis_blocked = false;
+            bool positive_y_axis_blocked = false;
+            bool negative_y_axis_blocked = false;
+            for (int i = 1; i < 8; i++)
+            {
+                if (m_selected_piece.y + 1 * i <= 7 && m_selected_piece.x + 1 * i <= 7)
+                {
+                    if (!positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text == "")
+                        b_board[selected_piece.x + 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                    else if (!positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text != "" && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x + 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                        positive_x_axis_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text != "")
+                        positive_x_axis_blocked = true;
+                }
+                if (m_selected_piece.y - 1 * i >= 0 && m_selected_piece.x - 1 * i >= 0)
+                {
+                    if (!negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text == "")
+                        b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                    else if (!negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                        negative_x_axis_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text != "")
+                        negative_x_axis_blocked = true;
+                }
+                if (m_selected_piece.y + 1 * i <= 7 && m_selected_piece.x - 1 * i >= 0)
+                {
+                    if (!positive_y_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text == "")
+                        b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                    else if (!positive_y_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                        positive_y_axis_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text != "")
+                        positive_y_axis_blocked = true;
+                }
+                if (m_selected_piece.y - 1 * i >= 0 && m_selected_piece.x + 1 * i <= 7)
+                {
+                    if (!negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text == "")
+                        b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                    else if (!negative_y_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                        negative_y_axis_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x + 1 * i, m_selected_piece.y - 1 * i].Text != "")
+                        negative_y_axis_blocked = true;
+                }
+            }
+        }
+        public void Queen_Moves(Piece selected_piece)
+        {
+            bool right_down_diagonal_blocked = false;
+            bool left_up_diagonal_blocked = false;
+            bool left_down_diagonal_blocked = false;
+            bool right_up_diagonal_blocked = false;
+            bool positive_x_axis_blocked = false;
+            bool negative_x_axis_blocked = false;
+            bool positive_y_axis_blocked = false;
+            bool negative_y_axis_blocked = false;
+            for (int i = 1; i < 8; i++)
+            {
+                if (m_selected_piece.y + 1 * i <= 7 && m_selected_piece.x + 1 * i <= 7)
+                {
+                    if (!right_down_diagonal_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text == "")
+                        b_board[selected_piece.x + 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                    else if (!right_down_diagonal_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text != "" && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x + 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                        right_down_diagonal_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x + 1 * i, m_selected_piece.y + 1 * i].Text != "")
+                        right_down_diagonal_blocked = true;
+                }
+                if (m_selected_piece.y - 1 * i >= 0 && m_selected_piece.x - 1 * i >= 0)
+                {
+                    if (!left_up_diagonal_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text == "")
+                        b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                    else if (!left_up_diagonal_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x - 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                        left_up_diagonal_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x - 1 * i, m_selected_piece.y - 1 * i].Text != "")
+                        left_up_diagonal_blocked = true;
+                }
+                if (m_selected_piece.y + 1 * i <= 7 && m_selected_piece.x - 1 * i >= 0)
+                {
+                    if (!left_down_diagonal_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text == "")
+                        b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                    else if (!left_down_diagonal_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x - 1 * i, selected_piece.y + 1 * i].Enabled = true;
+                        left_down_diagonal_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x - 1 * i, m_selected_piece.y + 1 * i].Text != "")
+                        left_down_diagonal_blocked = true;
+                }
+                if (m_selected_piece.y - 1 * i >= 0 && m_selected_piece.x + 1 * i <= 7)
+                {
+                    if (!right_up_diagonal_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text == "")
+                        b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                    else if (!right_up_diagonal_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x + 1 * i, selected_piece.y - 1 * i].Enabled = true;
+                        right_up_diagonal_blocked = true;
+                    }
+                    else if (b_board[m_selected_piece.x + 1 * i, m_selected_piece.y - 1 * i].Text != "")
+                        right_up_diagonal_blocked = true;
+
+                    if (m_selected_piece.x + 1 * i <= 7 && !positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text == "")
+                        b_board[selected_piece.x + 1 * i, selected_piece.y].Enabled = true;
+                    else if (m_selected_piece.x + 1 * i <= 7 && !positive_x_axis_blocked && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text != "" && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x + 1 * i, selected_piece.y].Enabled = true;
+                        positive_x_axis_blocked = true;
+                    }
+                    else if (m_selected_piece.x + 1 * i <= 7 && b_board[m_selected_piece.x + 1 * i, m_selected_piece.y].Text != "")
+                        positive_x_axis_blocked = true;
+
+                    if (m_selected_piece.x - 1 * i >= 0 && !negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text == "")
+                        b_board[selected_piece.x - 1 * i, selected_piece.y].Enabled = true;
+                    else if (m_selected_piece.x - 1 * i >= 0 && !negative_x_axis_blocked && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text != "" && b_board[selected_piece.x - 1 * i, selected_piece.y].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x - 1 * i, selected_piece.y].Enabled = true;
+                        negative_x_axis_blocked = true;
+                    }
+                    else if (m_selected_piece.x - 1 * i >= 0 && b_board[m_selected_piece.x - 1 * i, m_selected_piece.y].Text != "")
+                        negative_x_axis_blocked = true;
+
+                    if (m_selected_piece.y + 1 * i <= 7 && !positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text == "")
+                        b_board[selected_piece.x, selected_piece.y + 1 * i].Enabled = true;
+                    else if (m_selected_piece.y + 1 * i <= 7 && !positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text != "" && b_board[selected_piece.x, selected_piece.y + 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x, selected_piece.y + 1 * i].Enabled = true;
+                        positive_y_axis_blocked = true;
+                    }
+                    else if (m_selected_piece.y + 1 * i <= 7 && b_board[m_selected_piece.x, m_selected_piece.y + 1 * i].Text != "")
+                        positive_y_axis_blocked = true;
+
+                    if (m_selected_piece.y - 1 * i >= 0 && !negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text == "")
+                        b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
+                    else if (m_selected_piece.y - 1 * i >= 0 && !negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text != "" && b_board[selected_piece.x, selected_piece.y - 1 * i].ForeColor != Color.Gray)
+                    {
+                        b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
+                        negative_y_axis_blocked = true;
+                    }
+                    else if (m_selected_piece.y - 1 * i >= 0 && b_board[m_selected_piece.x, m_selected_piece.y - 1 * i].Text != "")
+                        negative_y_axis_blocked = true;
+                }
+            }
+        }
+        public void Set_Tiles_For_Move(Piece selected_piece)
+        {
+            if (selected_piece is Pawn)
+                Pawn_Moves(selected_piece);
+            if (selected_piece is Rook)
+                Rook_Moves(selected_piece);
+            if (selected_piece is Bishop)
+                Bishop_Moves(selected_piece);
+            if (selected_piece is Queen)
+                Queen_Moves(selected_piece);
+        }
+
         public void Process_Move(Piece selected_piece, int x, int y)
         {
+            selected_piece.x = x;
+            selected_piece.y = y;
+            selected_piece.has_moved = true;
+            foreach (Piece piece in ai_pieces)
+            {
+                if (piece.x == x && piece.y == y)
+                {
+                    piece.is_on_board = false;
+                }
+            }
+            if (selected_piece != null && selected_piece is Pawn && selected_piece.y == 0)
+                Promote_Pawn(m_selected_piece, x, y);
+            Board_fill();
+            m_selected_piece = null;
+            
+
+            
+        }
+        public void Promote_Pawn(Piece selected_piece, int x, int y)
+        {
+            int promote_value = Prompt.ShowDialog("1. Queen, &2. &Bishop, &3. &Knight, &4. &Rook", "Promote");
+            int player_pieces_length = player_pieces.Count(s => s != null);
+            for (int i = 0; i < player_pieces.Length; i++)
+            {
+                if (selected_piece.x == player_pieces[i].x && selected_piece.y == player_pieces[i].y)
+                {
+                    switch (promote_value)
+                    {
+                        case 1:
+                            player_pieces[i] = new Queen(selected_piece.x, selected_piece.y);
+                            break;
+                        case 2:
+                            player_pieces[i] = new Bishop(selected_piece.x, selected_piece.y);
+                            break;
+                        case 3:
+                            player_pieces[i] = new Knight(selected_piece.x, selected_piece.y);
+                            break;
+                        case 4:
+                            player_pieces[i] = new Rook(selected_piece.x, selected_piece.y);
+                            break;
+                        default:
+                            MessageBox.Show("The fuck you trying to do");
+                            break;
+                    }
+                        
+                   
+                }
+            }
 
         }
 
         private void NewButton_CLick(object sender, EventArgs e)
         {
+            
             Button button = (Button)sender;
             // Get's buttons x and y co-ordinates
             string[] buttonName = button.Name.Split('_');
             int x = Convert.ToInt32(buttonName[0]);
             int y = Convert.ToInt32(buttonName[1]);
+            
+
 
             //deselect selected piece
             if (m_selected_piece != null && m_selected_piece.x == x && m_selected_piece.y == y)
@@ -207,19 +554,13 @@ namespace Chess
             //updates selection if needed
             foreach (Piece piece in player_pieces)
             {
-                if (piece.x == x && piece.y == y)
+                if (piece != null && piece.x == x && piece.y == y)
                 {
                     m_selected_piece = piece;
                 }
             }
-            foreach (Piece piece in ai_pieces)
-            {
-                if (piece.x == x && piece.y == y)
-                {
-                    m_selected_piece = piece;
-                }
-            }
-            if (m_selected_piece != null && m_selected_piece.x != x && m_selected_piece.y != y)
+            Set_Tiles_For_Move(m_selected_piece);
+            if (m_selected_piece != null && m_selected_piece.x != x || m_selected_piece.y != y)
             {
                 Process_Move(m_selected_piece, x, y);
             }
