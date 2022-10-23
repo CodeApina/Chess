@@ -261,6 +261,7 @@ namespace Chess
                     b_board[m_selected_piece.x, m_selected_piece.y - 1].Enabled = true;
             }
         }
+        //TODO: Enable castling.
         public void Rook_Moves(Piece selected_piece)
         {
             bool positive_x_axis_blocked = false;
@@ -311,6 +312,7 @@ namespace Chess
             }
 
         }
+        //TODO: FIX
         public void Bishop_Moves(Piece selected_piece)
         {
             bool positive_x_axis_blocked = false;
@@ -369,6 +371,7 @@ namespace Chess
                 }
             }
         }
+        //TODO: FIX
         public void Queen_Moves(Piece selected_piece)
         {
             bool right_down_diagonal_blocked = false;
@@ -471,6 +474,7 @@ namespace Chess
                 }
             }
         }
+        //TODO: Make so king can't move to a check mate & enable castling
         public void King_Moves(Piece selected_piece)
         {
             if (selected_piece.x + 1 <= 7)
@@ -490,6 +494,7 @@ namespace Chess
             if (selected_piece.x - 1 >= 0 && selected_piece.y + 1 <= 7)
                 b_board[selected_piece.x - 1, selected_piece.y + 1].Enabled = true;
         }
+        //TODO: Add Knight moves 
         public void Set_Tiles_For_Move(Piece selected_piece)
         {
             if (selected_piece is Pawn)
@@ -503,7 +508,7 @@ namespace Chess
             if (selected_piece is King)
                 King_Moves(selected_piece);
         }
-
+        //TODO: Add check mates
         public void Process_Move(Piece selected_piece, int x, int y)
         {
             selected_piece.x = x;
