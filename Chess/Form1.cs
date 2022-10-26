@@ -152,52 +152,10 @@ namespace Chess
                     b.Size = new Size(50, 50);
                     b.Location = new Point(100 + 50 * x, 100 + 50 * y);
                     // Sets up the button names
-                    b.Name = $"{x}_{y}";
-                    /*if (b.Name == $"{x}_6")
-                    {
-                        b.Text = "P";
-                    }
-                    if (b.Name == $"{x}_1")
-                        b.Text = "P";
-                    if (b.Name == "0_0" || b.Name == "0_7" || b.Name == "7_7" || b.Name == "7_0")
-                        b.Text = "R";
-                    if (b.Name == "1_0" || b.Name == "1_7" || b.Name == "6_7" || b.Name == "6_0")
-                        b.Text = "Kn";
-                    if (b.Name == "2_0" || b.Name == "2_7" || b.Name == "5_7" || b.Name == "5_0")
-                        b.Text = "B";
-                    if (b.Name == "3_0" || b.Name == "3_7")
-                        b.Text = "Q";
-                    if (b.Name == "4_0" || b.Name == "4_7")
-                        b.Text = "K";
-                    foreach (Piece piece1 in player_pieces)
-                    {
-
-                    }
-                    for (int i = 0; i < 8; i++)
-                    {
-                        x = player_pieces[(int)i].x;
-                        y = player_pieces[(int)i].y;
-                        if (b.Name == $"{x}_{y}")
-                        {
-                            b.Text = player_pieces[i].piece_text;
-                        }
-                        ai_pieces[(int)i].x = x;
-                        ai_pieces[(int)i].y = y;
-                        if (b.Name == $"{x}_{y}")
-                        {
-                            b.Text = ai_pieces[i].piece_text;
-                        }
-                    }
-
-                    // Colors the white piece names to gray
-                    if (b.Name == $"{x}_6" || b.Name == $"{x}_7")
-                        b.ForeColor = Color.Gray;*/
-
+                    b.Name = $"{x}_{y}";                    
                     b.Enabled = false;
                     // Colors the board correctly
-                    if ((x % 2 == 0 && y % 2 == 0) || (x == 0 && y == 0))
-                        b.BackColor = Color.White;
-                    else if (x % 2 != 0 && y % 2 != 0)
+                    if ((x % 2 == 0 && y % 2 == 0) || (x == 0 && y == 0) || (x % 2 != 0 && y % 2 != 0))
                         b.BackColor = Color.White;
                     else b.BackColor = Color.SandyBrown;
                     this.Controls.Add(b);
@@ -237,22 +195,22 @@ namespace Chess
             {
                 b_board[m_selected_piece.x, m_selected_piece.y - 1].Enabled = true;
                 b_board[m_selected_piece.x, m_selected_piece.y - 2].Enabled = true;
-                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "")
                 {
                     b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Enabled = true;
                 }
-                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "")
                 {
                     b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Enabled = true;
                 }
             }
             if (selected_piece.has_moved == true && m_selected_piece.y - 1 >= 0)
             {
-                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                if (selected_piece.x - 1 >= 0 && b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Text != "")
                 {
                     b_board[m_selected_piece.x - 1, m_selected_piece.y - 1].Enabled = true;
                 }
-                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "" && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].ForeColor != Color.Gray)
+                if (selected_piece.x + 1 <= 7 && b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Text != "")
                 {
                     b_board[m_selected_piece.x + 1, m_selected_piece.y - 1].Enabled = true;
                 }
@@ -271,53 +229,45 @@ namespace Chess
             {
                 if (selected_piece is Rook)
                 {
-                    if (m_selected_piece.x + i <= 7)
+                    if (m_selected_piece.x + i <= 7 && !positive_x_axis_blocked)
                     {
-                        if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y].Text == "")
+                        if (b_board[m_selected_piece.x + i, m_selected_piece.y].Text == "")
                             b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
-                        else if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y].Text != "")
-                        {
-                            b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
-                            positive_x_axis_blocked = true;
-                        }
                         else if (b_board[m_selected_piece.x + i, m_selected_piece.y].Text != "")
+                        {
+                            b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
                             positive_x_axis_blocked = true;
-                    }
-                    if (m_selected_piece.x - i >= 0)
-                    {
-                        if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y].Text == "")
-                            b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
-                        else if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y].Text != "")
-                        {
-                            b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
-                            negative_x_axis_blocked = true;
                         }
+                    }
+                    if (m_selected_piece.x - i >= 0 && !negative_x_axis_blocked)
+                    {
+                        if (b_board[m_selected_piece.x - i, m_selected_piece.y].Text == "")
+                            b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
                         else if (b_board[m_selected_piece.x - i, m_selected_piece.y].Text != "")
+                        {
+                            b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
                             negative_x_axis_blocked = true;
+                        }
                     }
-                    if (m_selected_piece.y + i <= 7)
+                    if (m_selected_piece.y + i <= 7 && !positive_y_axis_blocked)
                     {
-                        if (!positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + i].Text == "")
+                        if (b_board[m_selected_piece.x, m_selected_piece.y + i].Text == "")
                             b_board[selected_piece.x, selected_piece.y + i].Enabled = true;
-                        else if (!positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
+                        else if (b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
                         {
                             b_board[selected_piece.x, selected_piece.y + i].Enabled = true;
                             positive_y_axis_blocked = true;
                         }
-                        else if (m_selected_piece.y + i <= 7 && b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
-                            positive_y_axis_blocked = true;
                     }
-                    if (m_selected_piece.y - i >= 0)
+                    if (m_selected_piece.y - i >= 0 && !negative_y_axis_blocked)
                     {
-                        if (!negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - i].Text == "")
+                        if (b_board[m_selected_piece.x, m_selected_piece.y - i].Text == "")
                             b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
-                        else if (!negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
+                        else if (b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
                         {
                             b_board[selected_piece.x, selected_piece.y - i].Enabled = true;
                             negative_y_axis_blocked = true;
                         }
-                        else if (m_selected_piece.y - i >= 0 && b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
-                            negative_y_axis_blocked = true;
                     }
                 }
             }
@@ -331,53 +281,45 @@ namespace Chess
             bool negative_y_axis_blocked = false;
             for (int i = 1; i < 8; i++)
             {
-                if (m_selected_piece.y + i <= 7 && m_selected_piece.x + i <= 7)
+                if (m_selected_piece.y + i <= 7 && m_selected_piece.x + i <= 7 && !positive_x_axis_blocked)
                 {
-                    if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text == "")
+                    if (b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text == "")
                         b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
-                    else if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text != "")
-                    {
-                        b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
-                        positive_x_axis_blocked = true;
-                    }
                     else if (b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text != "")
+                    {
+                        b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
                         positive_x_axis_blocked = true;
-                }
-                if (m_selected_piece.y - i >= 0 && m_selected_piece.x - i >= 0)
-                {
-                    if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text == "")
-                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
-                    else if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text != "")
-                    {
-                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
-                        negative_x_axis_blocked = true;
                     }
+                }
+                if (m_selected_piece.y - i >= 0 && m_selected_piece.x - i >= 0 && !negative_x_axis_blocked)
+                {
+                    if (b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text == "")
+                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
                     else if (b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text != "")
+                    {
+                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
                         negative_x_axis_blocked = true;
-                }
-                if (m_selected_piece.y + i <= 7 && m_selected_piece.x - i >= 0)
-                {
-                    if (!positive_y_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text == "")
-                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
-                    else if (!positive_y_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text != "")
-                    {
-                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
-                        positive_y_axis_blocked = true;
                     }
+                }
+                if (m_selected_piece.y + i <= 7 && m_selected_piece.x - i >= 0 && !positive_y_axis_blocked)
+                {
+                    if (b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text == "")
+                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
                     else if (b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text != "")
+                    {
+                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
                         positive_y_axis_blocked = true;
+                    }
                 }
-                if (m_selected_piece.y - i >= 0 && m_selected_piece.x + i <= 7)
+                if (m_selected_piece.y - i >= 0 && m_selected_piece.x + i <= 7 && !negative_y_axis_blocked)
                 {
-                    if (!negative_y_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text == "")
+                    if (b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text == "")
                         b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
-                    else if (!negative_y_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text != "")
+                    else if (b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text != "")
                     {
                         b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
                         negative_y_axis_blocked = true;
                     }
-                    else if (b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text != "")
-                        negative_y_axis_blocked = true;
                 }
             }
         }
@@ -393,101 +335,85 @@ namespace Chess
             bool negative_y_axis_blocked = false;
             for (int i = 1; i < 8; i++)
             {
-                if (m_selected_piece.y + i <= 7 && m_selected_piece.x + i <= 7)
+                if (m_selected_piece.y + i <= 7 && m_selected_piece.x + i <= 7 && !right_down_diagonal_blocked)
                 {
-                    if (!right_down_diagonal_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text == "")
+                    if (b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text == "")
                         b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
-                    else if (!right_down_diagonal_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text != "")
-                    {
-                        b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
-                        right_down_diagonal_blocked = true;
-                    }
                     else if (b_board[m_selected_piece.x + i, m_selected_piece.y + i].Text != "")
+                    {
+                        b_board[selected_piece.x + i, selected_piece.y + i].Enabled = true;
                         right_down_diagonal_blocked = true;
-                }
-                if (m_selected_piece.y - i >= 0 && m_selected_piece.x - i >= 0)
-                {
-                    if (!left_up_diagonal_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text == "")
-                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
-                    else if (!left_up_diagonal_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text != "")
-                    {
-                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
-                        left_up_diagonal_blocked = true;
                     }
+                }
+                if (m_selected_piece.y - i >= 0 && m_selected_piece.x - i >= 0 && !left_up_diagonal_blocked)
+                {
+                    if (b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text == "")
+                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
                     else if (b_board[m_selected_piece.x - i, m_selected_piece.y - i].Text != "")
+                    {
+                        b_board[selected_piece.x - i, selected_piece.y - i].Enabled = true;
                         left_up_diagonal_blocked = true;
-                }
-                if (m_selected_piece.y + i <= 7 && m_selected_piece.x - i >= 0)
-                {
-                    if (!left_down_diagonal_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text == "")
-                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
-                    else if (!left_down_diagonal_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text != "")
-                    {
-                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
-                        left_down_diagonal_blocked = true;
                     }
+                }
+                if (m_selected_piece.y + i <= 7 && m_selected_piece.x - i >= 0 && !left_down_diagonal_blocked)
+                {
+                    if (b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text == "")
+                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
                     else if (b_board[m_selected_piece.x - i, m_selected_piece.y + i].Text != "")
+                    {
+                        b_board[selected_piece.x - i, selected_piece.y + i].Enabled = true;
                         left_down_diagonal_blocked = true;
-                }
-                if (m_selected_piece.y - i >= 0 && m_selected_piece.x + i <= 7)
-                {
-                    if (!right_up_diagonal_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text == "")
-                        b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
-                    else if (!right_up_diagonal_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text != "")
-                    {
-                        b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
-                        right_up_diagonal_blocked = true;
                     }
+                }
+                if (m_selected_piece.y - i >= 0 && m_selected_piece.x + i <= 7 && !right_up_diagonal_blocked)
+                {
+                    if (b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text == "")
+                        b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
                     else if (b_board[m_selected_piece.x + i, m_selected_piece.y - i].Text != "")
+                    {
+                        b_board[selected_piece.x + i, selected_piece.y - i].Enabled = true;
                         right_up_diagonal_blocked = true;
-                }
-                if (m_selected_piece.x + i <= 7)
-                {
-                    if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y].Text == "")
-                        b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
-                    else if (!positive_x_axis_blocked && b_board[m_selected_piece.x + i, m_selected_piece.y].Text != "")
-                    {
-                        b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
-                        positive_x_axis_blocked = true;
                     }
+                }
+                if (m_selected_piece.x + i <= 7 && !positive_x_axis_blocked)
+                {
+                    if (b_board[m_selected_piece.x + i, m_selected_piece.y].Text == "")
+                        b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
                     else if (b_board[m_selected_piece.x + i, m_selected_piece.y].Text != "")
+                    {
+                        b_board[selected_piece.x + i, selected_piece.y].Enabled = true;
                         positive_x_axis_blocked = true;
-                }
-                if (m_selected_piece.x - i >= 0)
-                {
-                    if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y].Text == "")
-                        b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
-                    else if (!negative_x_axis_blocked && b_board[m_selected_piece.x - i, m_selected_piece.y].Text != "")
-                    {
-                        b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
-                        negative_x_axis_blocked = true;
                     }
+                }
+                if (m_selected_piece.x - i >= 0 && !negative_x_axis_blocked)
+                {
+                    if (b_board[m_selected_piece.x - i, m_selected_piece.y].Text == "")
+                        b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
                     else if (b_board[m_selected_piece.x - i, m_selected_piece.y].Text != "")
+                    {
+                        b_board[selected_piece.x - i, selected_piece.y].Enabled = true;
                         negative_x_axis_blocked = true;
+                    }
                 }
-                if (m_selected_piece.y + i <= 7)
+                if (m_selected_piece.y + i <= 7 && !positive_y_axis_blocked)
                 {
-                    if (!positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + i].Text == "")
+                    if (b_board[m_selected_piece.x, m_selected_piece.y + i].Text == "")
                         b_board[selected_piece.x, selected_piece.y + i].Enabled = true;
-                    else if (!positive_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
+                    else if (b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
                     {
                         b_board[selected_piece.x, selected_piece.y + i].Enabled = true;
                         positive_y_axis_blocked = true;
                     }
-                    else if (m_selected_piece.y + i <= 7 && b_board[m_selected_piece.x, m_selected_piece.y + i].Text != "")
-                        positive_y_axis_blocked = true;
                 }
-                if (m_selected_piece.y - i >= 0)
+                if (m_selected_piece.y - i >= 0 && !negative_y_axis_blocked)
                 {
-                    if (!negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - i].Text == "")
+                    if (b_board[m_selected_piece.x, m_selected_piece.y - i].Text == "")
                         b_board[selected_piece.x, selected_piece.y - 1 * i].Enabled = true;
-                    else if (!negative_y_axis_blocked && b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
+                    else if (b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
                     {
                         b_board[selected_piece.x, selected_piece.y - i].Enabled = true;
                         negative_y_axis_blocked = true;
                     }
-                    else if (m_selected_piece.y - i >= 0 && b_board[m_selected_piece.x, m_selected_piece.y - i].Text != "")
-                        negative_y_axis_blocked = true;
                 }
             }
 
