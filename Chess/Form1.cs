@@ -20,6 +20,8 @@ namespace Chess
         public string piece_text;
         public bool is_on_board = true;
         public bool has_moved = false;
+        public bool in_check = false;
+
 
     }
     public sealed class Pawn : Piece
@@ -485,6 +487,48 @@ namespace Chess
                 }
             }
         }
+        public void King_Move_To_Check_Blocker(Piece selected_piece, bool check)
+        {
+            if (selected_piece.x + 1 <= 7)
+                b_board[selected_piece.x + 1, selected_piece.y].Text = selected_piece.piece_text;
+            if (selected_piece.x - 1 >= 0)
+                b_board[selected_piece.x - 1, selected_piece.y].Text = selected_piece.piece_text;
+            if (selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x, selected_piece.y + 1].Text = selected_piece.piece_text;
+            if (selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x, selected_piece.y - 1].Text = selected_piece.piece_text;
+            if (selected_piece.x + 1 <= 7 && selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x + 1, selected_piece.y + 1].Text = selected_piece.piece_text;
+            if (selected_piece.x - 1 >= 0 && selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x - 1, selected_piece.y - 1].Text = selected_piece.piece_text;
+            if (selected_piece.x + 1 <= 7 && selected_piece.y - 1 >= 0)
+                b_board[selected_piece.x + 1, selected_piece.y - 1].Text = selected_piece.piece_text;
+            if (selected_piece.x - 1 >= 0 && selected_piece.y + 1 <= 7)
+                b_board[selected_piece.x - 1, selected_piece.y + 1].Text = selected_piece.piece_text;
+            for (int i = 0; i < ai_pieces.Length; i++)
+            {
+                Piece piece = ai_pieces[i];
+                if (piece is Pawn)
+                    Pawn_Moves(piece);
+                if (piece is Rook)
+                    Rook_Moves(piece);
+                if (piece is Bishop)
+                    Bishop_Moves(piece);
+                if (piece is Queen)
+                    Queen_Moves(piece);
+                if (piece is King)
+                    King_Moves(piece);
+                if (piece is Knight)
+                    Knight_Moves(piece);
+            }
+            foreach (Button b in b_board)
+            {
+                if (b.Enabled == true && b.Text == "K" && b.ForeColor == Color.Gray)
+                {
+                    check = true;
+                }
+            }
+        }
         //TODO: Implement Check mate
         public bool Check_Mate(bool check)
         {
@@ -507,7 +551,10 @@ namespace Chess
             foreach (Button b in b_board)
             {
                 if (b.Enabled == true && b.Text == "K" && b.ForeColor != Color.Gray)
+                {
                     check = true;
+                    ai_pieces[15].in_check = true;
+                }
             }
             return check;
 
